@@ -2,6 +2,9 @@
 .godot/
 /android/
 
-# Export presets can contain credentials
-export_presets.cfg
+# Export output
+build/
+
+# export_presets.cfg is committed (Web preset only).
+# Never store keystore or signing passwords in it.
 *.tmp
