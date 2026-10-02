@@ -1,0 +1,31 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/player.gd" id="1_player"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ship"]
+albedo_color = Color(0.2, 0.8, 1, 1)
+emission_enabled = true
+emission = Color(0.05, 0.3, 0.5, 1)
+
+[sub_resource type="PrismMesh" id="PrismMesh_ship"]
+material = SubResource("StandardMaterial3D_ship")
+size = Vector3(1.2, 1.6, 0.4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ship"]
+size = Vector3(1, 0.6, 1.4)
+
+[node name="Player" type="Area3D" groups=["player"]]
+collision_mask = 0
+script = ExtResource("1_player")
+
+[node name="Visual" type="Node3D" parent="."]
+
+[node name="Mesh" type="MeshInstance3D" parent="Visual"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, 0)
+mesh = SubResource("PrismMesh_ship")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_ship")
+
+[node name="Muzzle" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
