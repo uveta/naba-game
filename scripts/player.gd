@@ -14,6 +14,8 @@ const BOUNDS_MAX: Vector2 = Vector2(4.5, 3.0)
 
 var _cooldown: float = 0.0
 var _invulnerable: float = 0.0
+var _touching: bool = false
+var _touch_target: Vector3 = Vector3.ZERO
 
 @onready var visual: Node3D = $Visual
 @onready var muzzle: Marker3D = $Muzzle
@@ -23,8 +25,23 @@ func _ready() -> void:
 	GameState.game_over.connect(_on_game_over)
 
 
+func _input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch:
+		_touching = event.pressed
+		if _touching:
+			_touch_target = _screen_to_world(event.position)
+	elif event is InputEventScreenDrag and _touching:
+		_touch_target = _screen_to_world(event.position)
+
+
 func _physics_process(delta: float) -> void:
 	var input := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	if _touching:
+		# Glide toward the finger at ship speed; steer value drives the bank.
+		var to_target := _touch_target - position
+		to_target.y = 0.0
+		var step := to_target.limit_length(speed * delta)
+		input = Vector2(step.x, step.z) / (speed * delta)
 	position.x = clampf(position.x + input.x * speed * delta, BOUNDS_MIN.x, BOUNDS_MAX.x)
 	position.z = clampf(position.z + input.y * speed * delta, BOUNDS_MIN.y, BOUNDS_MAX.y)
 
@@ -32,7 +49,7 @@ func _physics_process(delta: float) -> void:
 	visual.rotation.z = lerp_angle(visual.rotation.z, target_roll, roll_smoothing * delta)
 
 	_cooldown -= delta
-	if Input.is_action_pressed("shoot") and _cooldown <= 0.0:
+	if _cooldown <= 0.0:
 		_shoot()
 
 	if _invulnerable > 0.0:
@@ -46,6 +63,20 @@ func hit() -> void:
 		return
 	GameState.lose_life()
 	_invulnerable = invulnerable_time
+
+
+## Projects a screen position onto the ship's XZ plane, clamped to the play area.
+func _screen_to_world(screen_pos: Vector2) -> Vector3:
+	var camera := get_viewport().get_camera_3d()
+	var plane := Plane(Vector3.UP, global_position.y)
+	var intersection: Variant = plane.intersects_ray(camera.project_ray_origin(screen_pos), camera.project_ray_normal(screen_pos))
+	if intersection == null:
+		return position
+	var point := intersection as Vector3
+	return Vector3(
+		clampf(point.x, BOUNDS_MIN.x, BOUNDS_MAX.x),
+		position.y,
+		clampf(point.z, BOUNDS_MIN.y, BOUNDS_MAX.y))
 
 
 func _shoot() -> void:
