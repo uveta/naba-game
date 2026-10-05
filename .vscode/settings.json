@@ -1,0 +1,13 @@
+{
+  "godotTools.editorPath.godot4": "C:\\ProgramData\\Godot\\Godot_v4.7.2-stable_win64.exe",
+  "files.exclude": {
+    "**/*.uid": true,
+    "**/*.import": true,
+    ".godot/": true
+  },
+  "[gdscript]": {
+    "editor.detectIndentation": true,
+    "editor.insertSpaces": false,
+    "editor.tabSize": 4
+  }
+}
