@@ -17,7 +17,10 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if GameState.is_game_over and event.is_action_pressed("restart"):
+	if not GameState.is_game_over:
+		return
+	var tapped: bool = event is InputEventScreenTouch and event.pressed
+	if tapped or event.is_action_pressed("restart"):
 		get_tree().reload_current_scene()
 
 

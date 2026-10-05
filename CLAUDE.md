@@ -18,7 +18,7 @@ CI ([.github/workflows/deploy-web.yml](.github/workflows/deploy-web.yml)): expor
 - **Main scene** ([scenes/main.tscn](scenes/main.tscn), [scripts/main.gd](scripts/main.gd)) owns `SpawnTimer`, `Enemies` container, `Player`, `HUD`. Calls `GameState.reset()` in `_ready()`. Restart = `reload_current_scene()` → re-runs `_ready()`. Reset state there only.
 - **Collision = Area3D only**. No physics bodies. `Bullet` + `Enemy` connect `area_entered`, cast other area to `Enemy` / `Player` (both have `class_name`). Layers in [project.godot](project.godot): 1 `player`, 2 `enemy`, 3 `player_bullet`. New entity → set layer/mask on scene, else `area_entered` no fire.
 - **Hit API**: enemy → `Player.hit()` (invuln frames + `GameState.lose_life()`). Bullet → `GameState.add_score(enemy.points)` then `Enemy.die()`. Bullets added as player siblings (`get_parent().add_child`) → live under main scene root.
-- **Input** = actions in `project.godot`: `move_*`, `shoot`, `restart`. Keyboard (WASD/arrows/Space/Enter) + gamepad. Use action names. No raw keys.
+- **Input** = actions in `project.godot`: `move_*`, `restart`. Keyboard (WASD/arrows/Enter) + gamepad. Use action names. No raw keys. Exception: touch (`InputEventScreenTouch`/`ScreenDrag`) → ship glides to finger at `speed`; tap restarts after game over. Ship auto-fires always (no `shoot` action).
 
 ## Conventions
 
